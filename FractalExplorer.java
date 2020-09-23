@@ -20,7 +20,7 @@ public class FractalExplorer {
     private JButton resetButton;
     private JButton saveButton;
     private JImageDisplay display;
-    private JComboBox combo;
+    private JComboBox<String> combo;
     private JLabel descr;
     private JPanel northPanel;
     private JPanel southPanel;
@@ -45,12 +45,13 @@ public class FractalExplorer {
         
         this.descr = new JLabel("Select a fractal: ");
         //window.add(this.display,BorderLayout.NORTH);
-        this.combo = new JComboBox();
+        this.combo = new JComboBox<>();
         for(int i = 0; i < fracGen.size(); i++){
             combo.addItem(fracGen.get(i).toString());
         }
         //combo.addItem(this.fracGen.toString());
         //window.add(this.combo);
+        combo.addActionListener(new comboBoxListener());
 
         this.northPanel = new JPanel();
         northPanel.add(descr);
@@ -79,7 +80,10 @@ public class FractalExplorer {
                                                             this.display.getWidth(), x);
                 double yCoord = FractalGenerator.getCoord (this.complRange.y, this.complRange.y + this.complRange.height,
                                                             this.display.getHeight(), y);
-                int numOfIterations = this.fracGen.numIterations(xCoord, yCoord);
+                int selectedFrac = combo.getSelectedIndex();
+                if(selectedFrac >= fracGen.size())
+                    return;
+                int numOfIterations = this.fracGen.get(selectedFrac).numIterations(xCoord, yCoord);
                 int color = Color.HSBtoRGB(0, 0, 0);
                 if (numOfIterations != -1)
                 {
@@ -94,9 +98,19 @@ public class FractalExplorer {
         @Override
         public void actionPerformed(ActionEvent e) {
             // TODO Auto-generated method stub
-            fracGen.getInitialRange(complRange);
+            int i = combo.getSelectedIndex();
+            if(i >= fracGen.size())
+                return;
+            fracGen.get(i).getInitialRange(complRange);
             FractalExplorer.this.drawFractal();
             //display.repaint();
+        }
+    }
+    private class saveButtonListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+           
         }
     }
 
@@ -109,7 +123,9 @@ public class FractalExplorer {
             double yCoord = FractalGenerator.getCoord (complRange.y, complRange.y + complRange.height,
                                                         display.getHeight(), e.getY());
 
-            fracGen.recenterAndZoomRange(complRange, xCoord, yCoord, 0.5);
+            int selectedFrac = combo.getSelectedIndex();
+            if(selectedFrac >= fracGen.size());
+            fracGen.get(selectedFrac).recenterAndZoomRange(complRange, xCoord, yCoord, 0.5);
             FractalExplorer.this.drawFractal();                                    
             //display.repaint();
         }
@@ -140,10 +156,10 @@ public class FractalExplorer {
         public void actionPerformed(ActionEvent e) {
             // TODO Auto-generated method stub
             int i = combo.getSelectedIndex();
-            if (i >= fracGen.size()){
+            if (i >= fracGen.size())
                 return;
-            }
-            
+            fracGen.get(i).getInitialRange(complRange);
+            FractalExplorer.this.drawFractal();
         }
     }
 
