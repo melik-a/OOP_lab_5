@@ -1,14 +1,22 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D.Double;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.awt.event.*;
+
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class FractalExplorer {
     private int screenSize;
@@ -19,7 +27,7 @@ public class FractalExplorer {
     private JFrame window;
     private JButton resetButton;
     private JButton saveButton;
-    private JImageDisplay display;
+    public JImageDisplay display;
     private JComboBox<String> combo;
     private JLabel descr;
     private JPanel northPanel;
@@ -44,15 +52,13 @@ public class FractalExplorer {
         display.addMouseListener(new mouseClicksListener());
         
         this.descr = new JLabel("Select a fractal: ");
-        //window.add(this.display,BorderLayout.NORTH);
         this.combo = new JComboBox<>();
-        for(int i = 0; i < fracGen.size(); i++){
-            combo.addItem(fracGen.get(i).toString());
-        }
-        //combo.addItem(this.fracGen.toString());
-        //window.add(this.combo);
-        combo.addActionListener(new comboBoxListener());
 
+        for(int i = 0; i < fracGen.size(); i++)
+            combo.addItem(fracGen.get(i).toString());
+        int defaultFrac = 0;
+        combo.setSelectedIndex(defaultFrac);
+        combo.addActionListener(new comboBoxListener());
         this.northPanel = new JPanel();
         northPanel.add(descr);
         northPanel.add(combo);
@@ -64,12 +70,14 @@ public class FractalExplorer {
         southPanel.add(resetButton);
         southPanel.add(saveButton);
         window.add(southPanel, BorderLayout.SOUTH);
-        //window.add(this.button,BorderLayout.SOUTH);
         resetButton.addActionListener(new resetButtonListener());
+        saveButton.addActionListener(new saveButtonListener());
 
         window.pack();
         window.setVisible(true);
         window.setResizable(false);
+        fracGen.get(defaultFrac).getInitialRange(complRange);
+        this.drawFractal();
     }
 
     public void drawFractal(){
@@ -81,8 +89,8 @@ public class FractalExplorer {
                 double yCoord = FractalGenerator.getCoord (this.complRange.y, this.complRange.y + this.complRange.height,
                                                             this.display.getHeight(), y);
                 int selectedFrac = combo.getSelectedIndex();
-                if(selectedFrac >= fracGen.size())
-                    return;
+                //if(selectedFrac >= fracGen.size())
+                //    return;
                 int numOfIterations = this.fracGen.get(selectedFrac).numIterations(xCoord, yCoord);
                 int color = Color.HSBtoRGB(0, 0, 0);
                 if (numOfIterations != -1)
@@ -99,8 +107,8 @@ public class FractalExplorer {
         public void actionPerformed(ActionEvent e) {
             // TODO Auto-generated method stub
             int i = combo.getSelectedIndex();
-            if(i >= fracGen.size())
-                return;
+            //if(i >= fracGen.size())
+            //    return;
             fracGen.get(i).getInitialRange(complRange);
             FractalExplorer.this.drawFractal();
             //display.repaint();
@@ -110,7 +118,27 @@ public class FractalExplorer {
         @Override
         public void actionPerformed(ActionEvent e) {
             // TODO Auto-generated method stub
-           
+            JFileChooser chooser = new JFileChooser();
+            FileFilter filter = new FileNameExtensionFilter("PNG Images", "png");
+            chooser.setFileFilter(filter);
+            chooser.setAcceptAllFileFilterUsed(false);
+
+            int saveFile = chooser.showSaveDialog(window);
+            if(saveFile != JFileChooser.APPROVE_OPTION)
+                return;
+            File selectedFile = chooser.getSelectedFile();
+            
+            try
+            {                               
+				ImageIO.write(display.getBufImage(),"png",selectedFile);
+                JOptionPane.showMessageDialog(FractalExplorer.this.window,
+                                                "Fractal successfuly saved", "File save", JOptionPane.INFORMATION_MESSAGE);
+            }
+            catch (IOException except) 
+            {
+				except.printStackTrace();
+				JOptionPane.showMessageDialog(FractalExplorer.this.window, "Saving error", "File save", JOptionPane.WARNING_MESSAGE);
+			}
         }
     }
 
@@ -124,7 +152,8 @@ public class FractalExplorer {
                                                         display.getHeight(), e.getY());
 
             int selectedFrac = combo.getSelectedIndex();
-            if(selectedFrac >= fracGen.size());
+            //if(selectedFrac >= fracGen.size())
+            //    return;
             fracGen.get(selectedFrac).recenterAndZoomRange(complRange, xCoord, yCoord, 0.5);
             FractalExplorer.this.drawFractal();                                    
             //display.repaint();
@@ -156,8 +185,8 @@ public class FractalExplorer {
         public void actionPerformed(ActionEvent e) {
             // TODO Auto-generated method stub
             int i = combo.getSelectedIndex();
-            if (i >= fracGen.size())
-                return;
+           // if (i >= fracGen.size())
+             //   return;
             fracGen.get(i).getInitialRange(complRange);
             FractalExplorer.this.drawFractal();
         }
@@ -166,6 +195,6 @@ public class FractalExplorer {
     public static void main(String[] args) {
         FractalExplorer mandelbrotFrac = new FractalExplorer(400);
         mandelbrotFrac.createAndShowGUI();
-        mandelbrotFrac.drawFractal();
+        //mandelbrotFrac.drawFractal();
     }
 }

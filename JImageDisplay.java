@@ -43,4 +43,8 @@ public class JImageDisplay extends javax.swing.JComponent {
         g.drawString("o", x, y);
         this.repaint();
     }
+
+    public BufferedImage getBufImage(){
+        return this.displImage;
+    }
 }
