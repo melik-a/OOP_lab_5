@@ -1,31 +1,41 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D.Double;
-
+import java.util.ArrayList;
 import java.awt.event.*;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 public class FractalExplorer {
     private int screenSize;
     
-    private FractalGenerator fracGen;
+    private ArrayList<FractalGenerator> fracGen;
     private Double complRange;
    
     private JFrame window;
-    private JButton button;
+    private JButton resetButton;
+    private JButton saveButton;
     private JImageDisplay display;
+    private JComboBox combo;
+    private JLabel descr;
+    private JPanel northPanel;
+    private JPanel southPanel;
 
     FractalExplorer(int size){
         this.screenSize = size;
-        this.fracGen = new Mandelbrot();
+        this.fracGen = new ArrayList<FractalGenerator>();
+        fracGen.add(new Mandelbrot());
+        fracGen.add(new Tricorn());
+        fracGen.add(new BurningShip());
         this.complRange = new Double();
-        fracGen.getInitialRange(complRange);
     }
 
     public void createAndShowGUI(){
-        this.window = new JFrame("Mandelbrot fractal");
+        this.window = new JFrame("Fractals");
         this.window.setSize(screenSize, screenSize);
         this.window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -33,9 +43,28 @@ public class FractalExplorer {
         window.add(this.display,BorderLayout.CENTER);
         display.addMouseListener(new mouseClicksListener());
         
-        this.button = new JButton("Reset");
-        window.add(this.button,BorderLayout.SOUTH);
-        button.addActionListener(new resetButtonListener());
+        this.descr = new JLabel("Select a fractal: ");
+        //window.add(this.display,BorderLayout.NORTH);
+        this.combo = new JComboBox();
+        for(int i = 0; i < fracGen.size(); i++){
+            combo.addItem(fracGen.get(i).toString());
+        }
+        //combo.addItem(this.fracGen.toString());
+        //window.add(this.combo);
+
+        this.northPanel = new JPanel();
+        northPanel.add(descr);
+        northPanel.add(combo);
+        window.add(northPanel, BorderLayout.NORTH);
+
+        this.resetButton = new JButton("Reset");
+        this.saveButton = new JButton("Save");
+        this.southPanel = new JPanel();
+        southPanel.add(resetButton);
+        southPanel.add(saveButton);
+        window.add(southPanel, BorderLayout.SOUTH);
+        //window.add(this.button,BorderLayout.SOUTH);
+        resetButton.addActionListener(new resetButtonListener());
 
         window.pack();
         window.setVisible(true);
@@ -105,6 +134,19 @@ public class FractalExplorer {
             
         }
     }
+
+    public class comboBoxListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+            int i = combo.getSelectedIndex();
+            if (i >= fracGen.size()){
+                return;
+            }
+            
+        }
+    }
+
     public static void main(String[] args) {
         FractalExplorer mandelbrotFrac = new FractalExplorer(400);
         mandelbrotFrac.createAndShowGUI();
