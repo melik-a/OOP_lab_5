@@ -89,8 +89,7 @@ public class FractalExplorer {
                 double yCoord = FractalGenerator.getCoord (this.complRange.y, this.complRange.y + this.complRange.height,
                                                             this.display.getHeight(), y);
                 int selectedFrac = combo.getSelectedIndex();
-                //if(selectedFrac >= fracGen.size())
-                //    return;
+
                 int numOfIterations = this.fracGen.get(selectedFrac).numIterations(xCoord, yCoord);
                 int color = Color.HSBtoRGB(0, 0, 0);
                 if (numOfIterations != -1)
@@ -107,11 +106,9 @@ public class FractalExplorer {
         public void actionPerformed(ActionEvent e) {
             // TODO Auto-generated method stub
             int i = combo.getSelectedIndex();
-            //if(i >= fracGen.size())
-            //    return;
+
             fracGen.get(i).getInitialRange(complRange);
             FractalExplorer.this.drawFractal();
-            //display.repaint();
         }
     }
     private class saveButtonListener implements ActionListener{
@@ -152,11 +149,9 @@ public class FractalExplorer {
                                                         display.getHeight(), e.getY());
 
             int selectedFrac = combo.getSelectedIndex();
-            //if(selectedFrac >= fracGen.size())
-            //    return;
+
             fracGen.get(selectedFrac).recenterAndZoomRange(complRange, xCoord, yCoord, 0.5);
             FractalExplorer.this.drawFractal();                                    
-            //display.repaint();
         }
         @Override
         public void mouseEntered(MouseEvent e) {
@@ -185,16 +180,14 @@ public class FractalExplorer {
         public void actionPerformed(ActionEvent e) {
             // TODO Auto-generated method stub
             int i = combo.getSelectedIndex();
-           // if (i >= fracGen.size())
-             //   return;
+           
             fracGen.get(i).getInitialRange(complRange);
             FractalExplorer.this.drawFractal();
         }
     }
 
     public static void main(String[] args) {
-        FractalExplorer mandelbrotFrac = new FractalExplorer(400);
-        mandelbrotFrac.createAndShowGUI();
-        //mandelbrotFrac.drawFractal();
+        FractalExplorer fractals = new FractalExplorer(600);
+        fractals.createAndShowGUI();
     }
 }
